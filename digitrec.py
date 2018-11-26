@@ -1,11 +1,16 @@
 # Author: Kevin Delassus - G00270791
 # Adapted from: https://medium.com/coinmonks/handwritten-digit-prediction-using-convolutional-neural-networks-in-tensorflow-with-keras-and-live-5ebddf46dc8
+#               https://pythonspot.com/tk-file-dialogs/
+#               https://towardsdatascience.com/basics-of-image-classification-with-keras-43779a299c8b
 
 # Imports
 import keras as kr
 from keras.datasets import mnist
-import tkinter as tk
-from PIL import ImageTk, Image
+from tkinter import filedialog
+from tkinter import *
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
 
 # load data from keras.datasets
 (train_img, train_lbl), (test_img, y_test) = mnist.load_data()
@@ -21,12 +26,6 @@ test_img/=255
 # one hot encode
 train_lbl = kr.utils.to_categorical(train_lbl, 10)
 y_test = kr.utils.to_categorical(y_test, 10)
-
-#This creates the main window of an application
-window = tk.Tk()
-window.title("Join")
-window.geometry("300x300")
-window.configure(background='grey')
 
 # Building a Convolutional
 # Start a neural network, building it by layers.
@@ -56,3 +55,24 @@ model.save('models/mnistModel.h5')
 metrics = model.evaluate(test_img, y_test, verbose=0)
 print("Metrics(Test loss & Test Accuracy): ")
 print(metrics)
+
+root = Tk()
+root.testImage =  filedialog.askopenfilename(initialdir = "C:\\",title = "Select Image",filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
+print(root.testImage)
+
+imgFile = cv2.imread(root.testImage)
+img = cv2.resize(imgFile, (28, 28))
+arr = img.reshape(-1,28, 28, 1).astype('float32')
+#arr = np.expand_dims(arr, axis=0)
+arr/=255
+prediction = model.predict_classes(arr)
+
+pre = prediction[0]
+
+print("Class: ",pre)
+
+plt.imshow(imgFile)
+plt.title(pre)
+plt.show()
+
+#print(prediction)
