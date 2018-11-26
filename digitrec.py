@@ -56,23 +56,27 @@ metrics = model.evaluate(test_img, y_test, verbose=0)
 print("Metrics(Test loss & Test Accuracy): ")
 print(metrics)
 
+# Asking user to enter own image for testing
 root = Tk()
 root.testImage =  filedialog.askopenfilename(initialdir = "C:\\",title = "Select Image",filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
 print(root.testImage)
 
+# Reading image and resizing it to correct CNN format
 imgFile = cv2.imread(root.testImage)
 img = cv2.resize(imgFile, (28, 28))
 arr = img.reshape(-1,28, 28, 1).astype('float32')
-#arr = np.expand_dims(arr, axis=0)
+
+# One hot encode arr
 arr/=255
-prediction = model.predict_classes(arr)
+# Making prediction
+result = model.predict_classes(arr)
 
-pre = prediction[0]
+prediction = result[0]
 
-print("Class: ",pre)
+# Displaying prediction
+print("Class: ",prediction)
 
+# Showing image and predicted result
 plt.imshow(imgFile)
-plt.title(pre)
+plt.title(prediction)
 plt.show()
-
-#print(prediction)
