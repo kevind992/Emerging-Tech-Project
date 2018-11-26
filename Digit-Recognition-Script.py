@@ -1,40 +1,48 @@
-import tensorflow as tf
-import gzip
-import numpy as np
-import matplotlib.pyplot as plt
+import numpy
+from keras.datasets import mnist
+import keras as kr
+from keras.layers.convolutional import Conv2D
+from keras.layers.convolutional import MaxPooling2D
+from keras.optimizers import Adam
+from keras.utils import np_utils
 
-mnist = tf.keras.datasets.mnist
+# load data
+(train_img, train_lbl), (test_img, y_test) = mnist.load_data()
 
-(x_train, y_train),(x_test, y_test) = mnist.load_data()
-x_train, x_test = x_train / 255.0, x_test / 255.0
+# Reshaping to format which CNN expects (batch, height, width, channels)
+train_img = train_img.reshape(train_img.shape[0], train_img.shape[1], train_img.shape[2], 1).astype('float32')
+test_img = test_img.reshape(test_img.shape[0], test_img.shape[1], test_img.shape[2], 1).astype('float32')
 
-with gzip.open('data/train-images-idx3-ubyte.gz', 'rb') as f:
-    train_img = f.read()
+# normalize inputs from 0-255 to 0-1
+train_img/=255
+test_img/=255
 
-with gzip.open('data/train-labels-idx1-ubyte.gz', 'rb') as f:
-    train_lbl = f.read()
+# one hot encode
+train_lbl = np_utils.to_categorical(train_lbl, 10)
+y_test = np_utils.to_categorical(y_test, 10)
 
-train_img = ~np.array(list(train_img[16:])).reshape(60000, 28, 28).astype(np.uint8)
-train_lbl =  np.array(list(train_lbl[ 8:])).astype(np.uint8)   
+# building a linear stack of layers with the sequential model
+# Start a neural network, building it by layers.
+# create model
+model = kr.models.Sequential()
 
-inputs = train_img.reshape(60000, 784)
+model.add(kr.layers.convolutional.Conv2D(32, (5, 5), input_shape=(train_img.shape[1], train_img.shape[2], 1), activation='relu'))
+model.add(kr.layers.convolutional.MaxPooling2D(pool_size=(2, 2)))
+model.add(kr.layers.convolutional.Conv2D(32, (3, 3), activation='relu'))
+model.add(kr.layers.convolutional.MaxPooling2D(pool_size=(2, 2)))
+model.add(kr.layers.Dropout(0.2))
+model.add(kr.layers.Flatten())
+model.add(kr.layers.Dense(128, activation='relu'))
+model.add(kr.layers.Dense(10, activation='softmax'))
 
-# For encoding categorical variables.
-import sklearn.preprocessing as pre
 
-encoder = pre.LabelBinarizer()
-encoder.fit(train_lbl)
-outputs = encoder.transform(train_lbl)
+# Compile model
+model.compile(loss='categorical_crossentropy', optimizer=Adam(), metrics=['accuracy'])
 
-model = tf.keras.models.Sequential([
-  #tf.keras.layers.Flatten(),
-  tf.keras.layers.Dense(784, activation=tf.nn.relu),
-  #tf.keras.layers.Dropout(0.2),
-  tf.keras.layers.Dense(10, activation=tf.nn.softmax)
-])
-model.compile(optimizer='adam',
-              loss='sparse_categorical_crossentropy',
-              metrics=['accuracy'])
+# Fit the model
+model.fit(train_img, train_lbl, validation_data=(test_img, y_test), epochs=10, batch_size=200)
 
-model.fit(inputs, outputs, epochs=5)
-
+# Final evaluation of the model
+metrics = model.evaluate(test_img, y_test, verbose=0)
+print("Metrics(Test loss & Test Accuracy): ")
+print(metrics)
