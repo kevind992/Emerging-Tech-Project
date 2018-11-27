@@ -23,6 +23,7 @@ def user_Input() :
     print("Enter '1' to Train a new Nerual Network")
     print("Enter '2' to make a Prediction using an exsisting model")
     print("Enter '0' to Exit")
+    print("============================================")
     inputNum = input()
     print("You have entered " + inputNum)
     print(type(inputNum))
@@ -30,13 +31,13 @@ def user_Input() :
    # while inputNum!=0:
     if inputNum == '1':
         epochs = int(input("Please Define amount of Epochs: "))
-        trainNetwork(epochs)
+        trainNeuralNetwork(epochs)
     elif inputNum == '2':
-        testNetwork()
+        testNeuralNetwork()
     else:
         print("Invalid Option.")
 
-def trainNetwork(epochsNum):
+def trainNeuralNetwork(epochsNum):
 
     # load data from keras.datasets
     (train_img, train_lbl), (test_img, y_test) = mnist.load_data()
@@ -92,7 +93,10 @@ def trainNetwork(epochsNum):
     print("Metrics(Test loss & Test Accuracy): ")
     print(metrics)
 
-def testNetwork():
+    # Testing Neural Network
+    testNeuralNetwork()
+
+def testNeuralNetwork():
 
     # load json and create model
     json_file = open('models/model.json', 'r')
