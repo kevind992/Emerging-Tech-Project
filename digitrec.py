@@ -2,6 +2,7 @@
 # Adapted from: https://medium.com/coinmonks/handwritten-digit-prediction-using-convolutional-neural-networks-in-tensorflow-with-keras-and-live-5ebddf46dc8
 #               https://pythonspot.com/tk-file-dialogs/
 #               https://towardsdatascience.com/basics-of-image-classification-with-keras-43779a299c8b
+#               https://machinelearningmastery.com/save-load-keras-deep-learning-models/
 
 # Imports
 import keras as kr
@@ -11,6 +12,8 @@ from tkinter import *
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
+from keras.models import model_from_json
+import os
 
 def user_Input() :
 
@@ -71,6 +74,15 @@ def trainNetwork(epochsNum):
     # Fit the model
     model.fit(train_img, train_lbl, validation_data=(test_img, y_test), epochs=epochsNum, batch_size=200)
 
+    # serialize model to JSON
+    model_json = model.to_json()
+    with open("models/model.json", "w") as json_file:
+        json_file.write(model_json)
+    # serialize weights to HDF5
+    model.save_weights("models/model.h5")
+    print("Saved model to disk")
+
+
     # Save the model for use within Jupyter Notebook
     model.save('models/mnistModel.h5')
     print("Model saved to 'models/mnistModel.h5'..")
@@ -81,6 +93,15 @@ def trainNetwork(epochsNum):
     print(metrics)
 
 def testNetwork():
+
+    # load json and create model
+    json_file = open('models/model.json', 'r')
+    loaded_model_json = json_file.read()
+    json_file.close()
+    loaded_model = model_from_json(loaded_model_json)
+    # load weights into new model
+    loaded_model.load_weights("models/model.h5")
+    print("Loaded model from disk")
 
     # Asking user to enter own image for testing
     root = Tk()
@@ -94,8 +115,9 @@ def testNetwork():
 
     # One hot encode arr
     arr/=255
+
     # Making prediction
-    result = model.predict_classes(arr)
+    result = loaded_model.predict_classes(arr)
 
     prediction = result[0]
 
