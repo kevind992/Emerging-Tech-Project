@@ -40,7 +40,7 @@ def user_Input() :
 def trainNeuralNetwork(epochsNum):
 
     # load data from keras.datasets
-    (train_img, train_lbl), (test_img, y_test) = mnist.load_data()
+    (train_img, train_lbl), (test_img, test_lbl) = mnist.load_data()
 
     # Reshape to the expected CNN format 
     train_img = train_img.reshape(train_img.shape[0], train_img.shape[1], train_img.shape[2], 1).astype('float32')
@@ -52,7 +52,7 @@ def trainNeuralNetwork(epochsNum):
 
     # one hot encode
     train_lbl = kr.utils.to_categorical(train_lbl, 10)
-    y_test = kr.utils.to_categorical(y_test, 10)
+    test_lbl = kr.utils.to_categorical(test_lbl, 10)
 
     # Building a Convolutional
     # Start a neural network, building it by layers.
@@ -73,7 +73,7 @@ def trainNeuralNetwork(epochsNum):
     model.compile(loss='categorical_crossentropy', optimizer=kr.optimizers.Adam(), metrics=['accuracy'])
 
     # Fit the model
-    model.fit(train_img, train_lbl, validation_data=(test_img, y_test), epochs=epochsNum, batch_size=200)
+    model.fit(train_img, train_lbl, validation_data=(test_img, test_lbl), epochs=epochsNum, batch_size=200)
 
     # serialize model to JSON
     model_json = model.to_json()
@@ -83,13 +83,8 @@ def trainNeuralNetwork(epochsNum):
     model.save_weights("models/model.h5")
     print("Saved model to disk")
 
-
-    # Save the model for use within Jupyter Notebook
-    model.save('models/mnistModel.h5')
-    print("Model saved to 'models/mnistModel.h5'..")
-
     # Evaluation of the model
-    metrics = model.evaluate(test_img, y_test, verbose=0)
+    metrics = model.evaluate(test_img, test_lbl, verbose=0)
     print("Metrics(Test loss & Test Accuracy): ")
     print(metrics)
 
