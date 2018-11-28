@@ -41,5 +41,20 @@ To run the notebooks open a terminal and navigate to where you have cloned the r
 Jupyter Notebook will now open within a browser window. You can now click into the notebook of your choice. 
 To run a specific notebook, press **Kernal** at the top of the window and then press **Restart & Run All**.
 This will run all the python commands.
-## Running the Script
-To suc
+## Running digitrec.py
+To successfully run the **digitrec.py** script, open a terminal and navigate to the Emerging-Tech-Project directory. To run the script type
+```sh
+   $ python digitrec.py
+```
+It will now give you the following options
+```sh
+   Please Select from the following Options:
+   ============================================
+   Enter '1' to Train a new Nerual Network
+   Enter '2' to make a Prediction using an exsisting model
+   Enter '0' to Exit
+   ============================================
+```
+Select **1** if your which to train you own neural network using the MNIST dataset. After you select 1 you will need to specify how many epochs you which to run. I recommend running 10. After entering the amount of epochs the script will now run. Once the neural network has finished training the model will be saved into the models directory and the script will automaticly go into the predictions stage. Once in the predictions stage a window will open prompting you to select an image to be predicted. Select a jpeg image and press open. For convenience I have included two test images within the img directory. Once the image has been selected another window will appear displaying the selected image and above the image will be the predicted result.
+
+If you select **2** when you run the script you will skip the training phase and go straight in the prediction stage. If you have already run the train stage you will be using your model to make predictions, other wise you will be using a model that I creating and uploaded. Again this was done for your convenience as training can take some time depending on your system.
